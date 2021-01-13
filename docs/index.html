@@ -41,80 +41,90 @@
             <span class="line left -v"></span>
           </a>
         </section>
+
+        <section class="god">
+          <h3>目前店家</h3>
+          <div id="result" style="text-align: left; font-size: 20px;">
+
+          </div>
+        </section>
       </div>
     </main>
 
     <script>
       const duration = 2000; // 拉霸效果執行多久
-      let food = [
-        '家園',
-        '火鍋',
-        '家樂福',
-        '阿姨早餐店',
-        '自助餐',
-        '新明路麵店',
-        '燒臘',
-      ]; // 素
+      const url =
+        'https://spreadsheets.google.com/feeds/list/1Wr9GclxB8-OrJ6WzNnTyGjnGHpyPfcpbVXHmW2aBMzY/1/public/values?alt=json';
 
-      // 點擊按鈕後執行
-      let r; // 亂數
-      let max, min; // 陣列的最大、小值
-      let txt; // 結果
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          let food = data.feed.entry.map((x, i) => {
+            let pre = document.getElementById('result');
+            pre.innerHTML += '<b>' + (i+1) + '. ' + x.title.$t + '</b><br>';
+            return x.title.$t
+          });
 
-      // 按鈕
-      const btn = document.querySelector('.btn-start');
+          // 點擊按鈕後執行
+          let r; // 亂數
+          let max, min; // 陣列的最大、小值
+          let txt; // 結果
 
-      btn.addEventListener(
-        'click',
-        (e) => {
-          e.preventDefault();
+          // 按鈕
+          const btn = document.querySelector('.btn-start');
 
-          // 選店家 fn
-          const chooseShop = (toggle) => {
-            // 取亂數 fn
-            r = () => {
-              max = toggle.length - 1;
-              min = 0;
-              return Math.floor(Math.random() * (max - min + 1)) + min;
-            };
+          btn.addEventListener(
+            'click',
+            (e) => {
+              e.preventDefault();
 
-            // 清空、插入選項
-            let input = document.querySelector('.wrap');
-            input.innerHTML = '';
-            for (let i = 0; i < toggle.length; i++) {
-              input.insertAdjacentHTML(
-                'beforeend',
-                '<span>' + toggle[i] + '</span>'
-              );
-            }
+              // 選店家 fn
+              const chooseShop = (toggle) => {
+                // 取亂數 fn
+                r = () => {
+                  max = toggle.length - 1;
+                  min = 0;
+                  return Math.floor(Math.random() * (max - min + 1)) + min;
+                };
 
-            // 禁止按鈕再被點擊
-            e.target.classList.add('not-allow');
+                // 清空、插入選項
+                let input = document.querySelector('.wrap');
+                input.innerHTML = '';
+                for (let i = 0; i < toggle.length; i++) {
+                  input.insertAdjacentHTML(
+                    'beforeend',
+                    '<span>' + toggle[i] + '</span>'
+                  );
+                }
 
-            // 加入動畫 class name
-            const list = document.querySelectorAll('.wrap > span');
-            Array.prototype.forEach.call(list, (l) =>
-              l.classList.add('span-' + (toggle.length - 1))
-            );
+                // 禁止按鈕再被點擊
+                e.target.classList.add('not-allow');
 
-            // 亂數決定中選店家
-            txt = toggle[r()];
-            list[0].innerText = txt;
+                // 加入動畫 class name
+                const list = document.querySelectorAll('.wrap > span');
+                Array.prototype.forEach.call(list, (l) =>
+                  l.classList.add('span-' + (toggle.length - 1))
+                );
 
-            // 移除動畫
-            setTimeout(() => {
-              // 停止拉霸動畫
-              Array.prototype.forEach.call(list, (l) =>
-                l.removeAttribute('class')
-              );
-              e.target.classList.remove('not-allow');
-            }, duration);
-          };
+                // 亂數決定中選店家
+                txt = toggle[r()];
+                list[0].innerText = txt;
 
-          chooseShop(food);
-        },
-        false
-      );
+                // 移除動畫
+                setTimeout(() => {
+                  // 停止拉霸動畫
+                  Array.prototype.forEach.call(list, (l) =>
+                    l.removeAttribute('class')
+                  );
+                  e.target.classList.remove('not-allow');
+                }, duration);
+              };
+
+              chooseShop(food);
+            },
+            false
+          );
+        });
     </script>
   </body>
 </html>
